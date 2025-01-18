@@ -1,0 +1,82 @@
+/* Fond noir avec texte vert (style terminal hacker) */
+body {
+    font-family: 'Courier New', monospace;
+    background-color: black;
+    color: #00FF00;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Conteneur qui simule un terminal */
+.terminal {
+    text-align: center;
+    border: 2px solid #00FF00;
+    padding: 20px;
+    width: 90%;
+    max-width: 1000px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+}
+
+/* Titre vert clignotant pour l'ambiance "hacker" */
+h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    animation: blink 1s step-start infinite;
+}
+
+/* Animation de clignotement pour le titre */
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Style de l'iframe pour qu'il s'intègre bien au style hacker */
+iframe {
+    border: 3px solid #00FF00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    border-radius: 5px;
+}
+
+/* Conteneur de la vidéo */
+.video-container {
+    width: 100%;
+    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+}
+
+/* Simulation d'un effet de texte qui "défile" sur le côté */
+body::before {
+    content: "ACCESS GRANTED...";
+    position: absolute;
+    top: 10px;
+    left: -300px;
+    font-size: 1.5em;
+    color: #00FF00;
+    animation: slide 10s linear infinite;
+}
+
+/* Animation de texte défilant */
+@keyframes slide {
+    0% {
+        left: -300px;
+    }
+    100% {
+        left: 100%;
+    }
+}
